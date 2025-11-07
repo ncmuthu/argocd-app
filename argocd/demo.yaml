@@ -1,1 +1,14 @@
-
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delay-job
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: wait
+          image: busybox
+          command: ["sh", "-c", "sleep 60"]
