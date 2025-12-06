@@ -6,7 +6,8 @@ metadata:
     app: hello-job
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation    
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+        argocd.argoproj.io/sync-wave: "10"
 spec:
   backoffLimit: 3
   template:
@@ -25,6 +26,8 @@ kind: ConfigMap
 metadata:
   name: sample-config-01
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 data:
   APP_ENV: "production"
   APP_VERSION: "1.0.0"
