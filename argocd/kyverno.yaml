@@ -36,11 +36,6 @@ spec:
                     repoURL: "https://github.com/ncmuthu/argocd-app.git"
                     revision: refs/heads/main
                     files:
-                      - path: apps/environment/{{.values.environment}}/{{ .values.appname }}/app.yaml
-                - git:
-                    repoURL: "https://github.com/ncmuthu/argocd-app.git"
-                    revision: refs/heads/main
-                    files:
                       - path: apps/cluster/{{.values.cluster}}/{{ .values.appname }}/app.yaml
       selector:
         matchExpressions:
