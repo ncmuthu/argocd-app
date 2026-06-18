@@ -47,7 +47,6 @@ spec:
     metadata:
       name: '{{ .values.cluster | lower }}-kyverno'
       labels:
-        k8s.autodesk.com/environment: '{{ .values.environment }}'
         k8s.autodesk.com/cluster-class: '{{ .values.clusterclass }}'
     spec:
       project: '{{ .values.project }}'
