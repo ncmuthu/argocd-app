@@ -21,6 +21,7 @@ spec:
                 moniker: '{{ index .metadata.labels "k8s.autodesk.com/moniker" }}'
                 project: '{{ index .metadata.labels "k8s.autodesk.com/project" }}'
                 clusterclass: '{{ index .metadata.labels "k8s.autodesk.com/cluster-class" }}'
+                clustergroup: '{{ index .metadata.labels "k8s.autodesk.com/cluster-group" }}'
                 appname: 'kyverno'
                 cluster: '{{ .name }}'
           - merge:
