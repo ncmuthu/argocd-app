@@ -1,0 +1,22 @@
+features:
+  policyExceptions:
+    # -- Enables the feature
+    enabled: true
+    # -- Restrict policy exceptions to a single namespace.
+    # Set to "*" to allow exceptions in all namespaces.
+    namespace: 'kyverno'
+admissionController:
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 70
+  container:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi

@@ -1,0 +1,92 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kyverno
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  applyNestedSelectors: true
+  generators:
+    - matrix:
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: k8s.autodesk.com/cluster-class
+                    operator: In
+                    values:
+                      - homelab
+              values:
+                moniker: '{{ index .metadata.labels "k8s.autodesk.com/moniker" }}'
+                project: '{{ index .metadata.labels "k8s.autodesk.com/project" }}'
+                clusterclass: '{{ index .metadata.labels "k8s.autodesk.com/cluster-class" }}'
+                appname: 'kyverno'
+                cluster: '{{ .name }}'
+          - merge:
+              mergeKeys:
+                - 'chart'
+              generators:
+                - git:
+                    repoURL: "https://github.com/ncmuthu/argocd-app.git"
+                    revision: refs/heads/main
+                    files:
+                      - path: apps/common/{{ .values.appname }}/app.yaml
+                - git:
+                    repoURL: "https://github.com/ncmuthu/argocd-app.git"
+                    revision: refs/heads/main
+                    files:
+                      - path: apps/environment/{{.values.environment}}/{{ .values.appname }}/app.yaml
+                - git:
+                    repoURL: "https://github.com/ncmuthu/argocd-app.git"
+                    revision: refs/heads/main
+                    files:
+                      - path: apps/cluster/{{.values.cluster}}/{{ .values.appname }}/app.yaml
+      selector:
+        matchExpressions:
+          - key: enabled
+            operator: In
+            values:
+              - 'true'
+  template:
+    metadata:
+      name: '{{ .values.cluster | lower }}-kyverno'
+      labels:
+        k8s.autodesk.com/environment: '{{ .values.environment }}'
+        k8s.autodesk.com/cluster-class: '{{ .values.clusterclass }}'
+    spec:
+      project: '{{ .values.project }}'
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - CreateNamespace=true
+          - RespectIgnoreDifferences=true
+          - ServerSideApply=true # required for adding CRDs
+      ignoreDifferences:
+        - kind: CustomResourceDefinition
+          group: apiextensions.k8s.io
+          jsonPointers:
+            - /spec/preserveUnknownFields
+            - /metadata/annotations
+            - /metadata/labels
+          jqPathExpressions:
+            - .spec.versions[].schema.openAPIV3Schema.selectableFields
+            - .spec.versions[].schema.openAPIV3Schema.properties.spec.selectableFields
+      sources:
+        - repoURL: 'https://github.com/ncmuthu/argocd-app.git'
+          targetRevision: refs/heads/main
+          ref: helm
+        - repoURL: '{{ .repoURL }}'
+          chart: '{{ .chart }}'
+          path: ''
+          targetRevision: '{{ .targetRevision }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $helm/values/common/{{ .values.appname }}/values.yaml
+              - $helm/values/cluster/{{ .values.cluster }}/{{ .values.appname }}/values.yaml
+      destination:
+        server: '{{ .server }}'
+        namespace: '{{ .namespace }}'

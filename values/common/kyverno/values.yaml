@@ -1,0 +1,30 @@
+# Kyverno common configuration
+config:
+  preserve: false
+
+backgroundController:
+  replicas: 1
+  podDisruptionBudget:
+    enabled: false
+
+admissionController:
+  replicas: 3
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  initContainer:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  container:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi

@@ -1,0 +1,5 @@
+chart: kyverno
+targetRevision: 3.7.0
+enabled: 'true'
+repoURL: 'https://kyverno.github.io/kyverno'
+namespace: kyverno
